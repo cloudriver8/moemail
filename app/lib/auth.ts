@@ -113,7 +113,7 @@ export const {
         if (!(await isRegistrationEnabled())) {
           throw new Error("注册已关闭")
         }
-        return baseAdapter.createUser(user)
+        return baseAdapter.createUser!(user)
       },
     }
   })(),
