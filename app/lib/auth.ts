@@ -21,6 +21,12 @@ const ROLE_DESCRIPTIONS: Record<Role, string> = {
   [ROLES.CIVILIAN]: "平民（普通用户）",
 }
 
+// REGISTRATION_ENABLED 为 "false" 时禁止新用户注册，未设置或其他值保持开放
+const isRegistrationEnabled = async (): Promise<boolean> => {
+  const disabled = await getRequestContext().env.SITE_CONFIG.get("REGISTRATION_ENABLED")
+  return disabled !== "false"
+}
+
 const getDefaultRole = async (): Promise<Role> => {
   const defaultRole = await getRequestContext().env.SITE_CONFIG.get("DEFAULT_ROLE")
 
@@ -95,10 +101,22 @@ export const {
   signOut
 } = NextAuth(() => ({
   secret: process.env.AUTH_SECRET,
-  adapter: DrizzleAdapter(createDb(), {
-    usersTable: users,
-    accountsTable: accounts,
-  }),
+  adapter: (() => {
+    const baseAdapter = DrizzleAdapter(createDb(), {
+      usersTable: users,
+      accountsTable: accounts,
+    })
+    // 关闭注册时拒绝 OAuth 首次登录自动建号，已有用户登录走 getUserByAccount 不受影响
+    return {
+      ...baseAdapter,
+      createUser: async (user) => {
+        if (!(await isRegistrationEnabled())) {
+          throw new Error("注册已关闭")
+        }
+        return baseAdapter.createUser(user)
+      },
+    }
+  })(),
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
@@ -237,6 +255,10 @@ export const {
 }))
 
 export async function register(username: string, password: string) {
+  if (!(await isRegistrationEnabled())) {
+    throw new Error("注册已关闭")
+  }
+
   const db = createDb()
 
   const existing = await db.query.users.findFirst({

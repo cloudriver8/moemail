@@ -107,6 +107,10 @@
     "adminContact": "관리자 연락처",
     "adminContactPlaceholder": "이메일 또는 기타 연락 방법",
     "maxEmails": "사용자당 최대 이메일 수",
+    "registration": {
+      "enable": "회원가입 허용",
+      "enableDescription": "비활성화하면 신규 사용자가 어떤 방법으로도 가입할 수 없습니다. 기존 계정에는 영향이 없습니다"
+    },
     "turnstile": {
       "enable": "Cloudflare Turnstile 활성화",
       "enableDescription": "활성화되면 사용자 이름/비밀번호 로그인 및 회원가입에 Turnstile 인증이 필요합니다",

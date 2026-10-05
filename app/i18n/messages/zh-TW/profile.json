@@ -107,6 +107,10 @@
     "adminContact": "管理員聯絡方式",
     "adminContactPlaceholder": "郵箱或其他聯絡方式",
     "maxEmails": "每個使用者最大郵箱數",
+    "registration": {
+      "enable": "開放註冊",
+      "enableDescription": "關閉後新使用者將無法透過任何方式註冊，既有帳號不受影響"
+    },
     "turnstile": {
       "enable": "啟用 Cloudflare Turnstile",
       "enableDescription": "啟用後，使用者名稱與密碼的登入／註冊需要通過 Turnstile 驗證",

@@ -26,6 +26,7 @@ export function WebsiteConfigPanel() {
   const [emailDomains, setEmailDomains] = useState<string>("")
   const [adminContact, setAdminContact] = useState<string>("")
   const [maxEmails, setMaxEmails] = useState<string>(EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString())
+  const [registrationEnabled, setRegistrationEnabled] = useState(true)
   const [turnstileEnabled, setTurnstileEnabled] = useState(false)
   const [turnstileSiteKey, setTurnstileSiteKey] = useState("")
   const [turnstileSecretKey, setTurnstileSecretKey] = useState("")
@@ -46,6 +47,7 @@ export function WebsiteConfigPanel() {
         emailDomains: string,
         adminContact: string,
         maxEmails: string,
+        registrationEnabled: boolean,
         turnstile?: {
           enabled: boolean,
           siteKey: string,
@@ -56,6 +58,7 @@ export function WebsiteConfigPanel() {
       setEmailDomains(data.emailDomains)
       setAdminContact(data.adminContact)
       setMaxEmails(data.maxEmails || EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString())
+      setRegistrationEnabled(data.registrationEnabled)
       setTurnstileEnabled(Boolean(data.turnstile?.enabled))
       setTurnstileSiteKey(data.turnstile?.siteKey ?? "")
       setTurnstileSecretKey(data.turnstile?.secretKey ?? "")
@@ -73,6 +76,7 @@ export function WebsiteConfigPanel() {
           emailDomains,
           adminContact,
           maxEmails: maxEmails || EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString(),
+          registrationEnabled,
           turnstile: {
             enabled: turnstileEnabled,
             siteKey: turnstileSiteKey,
@@ -154,6 +158,22 @@ export function WebsiteConfigPanel() {
               placeholder={`${EMAIL_CONFIG.MAX_ACTIVE_EMAILS}`}
             />
           </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <Label htmlFor="registration-enabled" className="text-sm font-medium">
+              {t("registration.enable")}
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              {t("registration.enableDescription")}
+            </p>
+          </div>
+          <Switch
+            id="registration-enabled"
+            checked={registrationEnabled}
+            onCheckedChange={setRegistrationEnabled}
+          />
         </div>
 
         <div className="space-y-4 rounded-lg border border-dashed border-primary/40 p-4">
