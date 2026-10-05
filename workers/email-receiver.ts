@@ -19,7 +19,23 @@ const handleEmail = async (message: ForwardableEmailMessage, env: Env) => {
     })
 
     if (!targetEmail) {
-      console.error(`Email not found: ${message.to}`)
+      // 未注册地址的邮件转入 catchall 兜底邮箱，避免直接丢失
+      const catchall = await db.query.emails.findFirst({
+        where: eq(sql`LOWER(${emails.address})`, 'catchall@edu-usa.me')
+      })
+      if (!catchall) {
+        console.error(`Email not found: ${message.to}`)
+        return
+      }
+      await db.insert(messages).values({
+        emailId: catchall.id,
+        fromAddress: message.from,
+        subject: `[to: ${message.to}] ${parsedMessage.subject || '(无主题)'}`,
+        content: parsedMessage.text || '',
+        html: parsedMessage.html || '',
+        type: 'received',
+      }).returning().get()
+      console.log(`Catch-all stored: ${message.to}`)
       return
     }
 
