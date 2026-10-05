@@ -56,7 +56,12 @@
     "subject": "제목",
     "date": "날짜",
     "loading": "로딩 중...",
-    "loadingMore": "더 불러오는 중..."
+    "loadingMore": "더 불러오는 중...",
+    "selectAll": "모두 선택",
+    "deleteSelected": "선택 항목 삭제 ({count})",
+    "batchDeleteConfirm": "일괄 삭제 확인",
+    "batchDeleteDescription": "선택한 {count}개의 메시지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "batchDeleteSuccess": "{count}개의 메시지가 삭제되었습니다"
   },
   "send": {
     "title": "이메일 보내기",

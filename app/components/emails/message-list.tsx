@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useTranslations } from "next-intl"
-import {Mail, Calendar, RefreshCw, Trash2, Share2} from "lucide-react"
+import { Mail, Calendar, RefreshCw, Trash2, Share2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useThrottle } from "@/hooks/use-throttle"
 import { EMAIL_CONFIG } from "@/config"
 import { useToast } from "@/components/ui/use-toast"
@@ -61,7 +62,15 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
   const messagesRef = useRef<Message[]>([]) // 添加 ref 来追踪最新的消息列表
   const [total, setTotal] = useState(0)
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [batchDeleting, setBatchDeleting] = useState(false)
+  const [showBatchConfirm, setShowBatchConfirm] = useState(false)
   const { toast } = useToast()
+
+  // 切换邮箱或类型时清空选择
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [email.id, messageType])
 
   // 当 messages 改变时更新 ref
   useEffect(() => {
@@ -183,6 +192,68 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
     }
   }
 
+  const toggleSelect = (messageId: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(messageId)) {
+        next.delete(messageId)
+      } else {
+        next.add(messageId)
+      }
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    setSelectedIds(prev => prev.size === messages.length ? new Set() : new Set(messages.map(m => m.id)))
+  }
+
+  const handleBatchDelete = async () => {
+    if (selectedIds.size === 0) return
+    setBatchDeleting(true)
+    try {
+      const response = await fetch(`/api/emails/${email.id}/messages/batch-delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageIds: Array.from(selectedIds) })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        toast({
+          title: tList("error"),
+          description: (data as { error: string }).error,
+          variant: "destructive"
+        })
+        return
+      }
+
+      const { deletedCount } = await response.json() as { deletedCount: number }
+      setMessages(prev => prev.filter(e => !selectedIds.has(e.id)))
+      setTotal(prev => prev - deletedCount)
+      setSelectedIds(new Set())
+
+      // 若当前选中的邮件被删了，清空预览
+      if (selectedMessageId && selectedIds.has(selectedMessageId)) {
+        onMessageSelect(null)
+      }
+
+      toast({
+        title: tList("success"),
+        description: t("batchDeleteSuccess", { count: deletedCount })
+      })
+    } catch {
+      toast({
+        title: tList("error"),
+        description: tList("deleteFailed"),
+        variant: "destructive"
+      })
+    } finally {
+      setBatchDeleting(false)
+      setShowBatchConfirm(false)
+    }
+  }
+
   useEffect(() => {
     if (!email.id) {
       return
@@ -210,15 +281,50 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
   <>
     <div className="h-full flex flex-col">
       <div className="p-2 flex justify-between items-center border-b border-primary/20">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className={cn("h-8 w-8", refreshing && "animate-spin")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className={cn("h-8 w-8", refreshing && "animate-spin")}
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          {messages.length > 0 && (
+            <>
+              <Checkbox
+                checked={selectedIds.size === messages.length}
+                onCheckedChange={toggleSelectAll}
+                aria-label={t("selectAll")}
+                className="h-4 w-4"
+              />
+              {selectedIds.size > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowBatchConfirm(true)}
+                  disabled={batchDeleting}
+                  className="h-8 px-2 text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  {t("deleteSelected", { count: selectedIds.size })}
+                </Button>
+              )}
+              {selectedIds.size > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedIds(new Set())}
+                  className="h-8 w-8"
+                  aria-label={tCommon("cancel")}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </>
+          )}
+        </div>
         <span className="text-xs text-gray-500">
           {total > 0 ? `${total} ${t("messageCount")}` : t("noMessages")}
         </span>
@@ -235,10 +341,18 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
                 onClick={() => onMessageSelect(message.id, messageType)}
                 className={cn(
                   "p-3 hover:bg-primary/5 cursor-pointer group",
-                  selectedMessageId === message.id && "bg-primary/10"
+                  selectedMessageId === message.id && "bg-primary/10",
+                  selectedIds.has(message.id) && "bg-primary/5"
                 )}
               >
                 <div className="flex items-start gap-3">
+                  <div onClick={(e) => e.stopPropagation()} className="flex items-center mt-1">
+                    <Checkbox
+                      checked={selectedIds.has(message.id)}
+                      onCheckedChange={() => toggleSelect(message.id)}
+                      className="h-4 w-4"
+                    />
+                  </div>
                   <Mail className="w-4 h-4 text-primary/60 mt-1" />
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{message.subject}</p>
@@ -308,6 +422,26 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
           <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
               onClick={() => messageToDelete && handleDelete(messageToDelete)}
+          >
+            {tCommon("delete")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    <AlertDialog open={showBatchConfirm} onOpenChange={setShowBatchConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("batchDeleteConfirm")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("batchDeleteDescription", { count: selectedIds.size })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+          <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={batchDeleting}
+              onClick={handleBatchDelete}
           >
             {tCommon("delete")}
           </AlertDialogAction>

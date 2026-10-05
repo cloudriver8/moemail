@@ -56,7 +56,12 @@
     "subject": "主旨",
     "date": "日期",
     "loading": "載入中...",
-    "loadingMore": "載入更多..."
+    "loadingMore": "載入更多...",
+    "selectAll": "全選",
+    "deleteSelected": "刪除所選 ({count})",
+    "batchDeleteConfirm": "確認批次刪除",
+    "batchDeleteDescription": "確定要刪除選中的 {count} 封郵件嗎？此操作不可復原。",
+    "batchDeleteSuccess": "已刪除 {count} 封郵件"
   },
   "send": {
     "title": "發送郵件",

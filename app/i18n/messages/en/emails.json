@@ -56,7 +56,12 @@
     "subject": "Subject",
     "date": "Date",
     "loading": "Loading...",
-    "loadingMore": "Loading more..."
+    "loadingMore": "Loading more...",
+    "selectAll": "Select all",
+    "deleteSelected": "Delete selected ({count})",
+    "batchDeleteConfirm": "Confirm Batch Delete",
+    "batchDeleteDescription": "Are you sure you want to delete {count} selected messages? This action cannot be undone.",
+    "batchDeleteSuccess": "{count} messages deleted"
   },
   "send": {
     "title": "Send Email",

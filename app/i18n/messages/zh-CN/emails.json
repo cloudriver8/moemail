@@ -56,7 +56,12 @@
     "subject": "主题",
     "date": "日期",
     "loading": "加载中...",
-    "loadingMore": "加载更多..."
+    "loadingMore": "加载更多...",
+    "selectAll": "全选",
+    "deleteSelected": "删除所选 ({count})",
+    "batchDeleteConfirm": "确认批量删除",
+    "batchDeleteDescription": "确定要删除选中的 {count} 封邮件吗？此操作不可恢复。",
+    "batchDeleteSuccess": "已删除 {count} 封邮件"
   },
   "send": {
     "title": "发送邮件",
