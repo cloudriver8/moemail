@@ -295,8 +295,7 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
             <>
               <Checkbox
                 checked={selectedIds.size === messages.length}
-                onCheckedChange={toggleSelectAll}
-                aria-label={t("selectAll")}
+                onChange={toggleSelectAll}
                 className="h-4 w-4"
               />
               {selectedIds.size > 0 && (
@@ -317,7 +316,7 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
                   size="icon"
                   onClick={() => setSelectedIds(new Set())}
                   className="h-8 w-8"
-                  aria-label={tCommon("cancel")}
+                  title={tCommon("cancel")}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -349,7 +348,7 @@ export function MessageList({ email, messageType, onMessageSelect, selectedMessa
                   <div onClick={(e) => e.stopPropagation()} className="flex items-center mt-1">
                     <Checkbox
                       checked={selectedIds.has(message.id)}
-                      onCheckedChange={() => toggleSelect(message.id)}
+                      onChange={() => toggleSelect(message.id)}
                       className="h-4 w-4"
                     />
                   </div>
