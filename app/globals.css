@@ -87,6 +87,13 @@
     scrollbar-color: hsl(var(--primary) / 0.2) transparent;
   }
 
+  /* Radix Select 注入样式会隐藏下拉滚动条（scrollbar-width:none），
+     用元素+属性选择器提高特异性将其恢复 */
+  div[data-radix-select-viewport] {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.2) transparent;
+  }
+
   /* 深色模式下的滚动条 */
   .dark ::-webkit-scrollbar-thumb {
     @apply bg-primary/30 hover:bg-primary/50;

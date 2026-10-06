@@ -5,11 +5,6 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// Radix 默认注入样式隐藏 viewport 滚动条（scrollbar-width:none / ::-webkit-scrollbar{display:none}），
-// 这里恢复显示，避免长列表无滚动提示
-const showScrollbar =
-  "[&_[data-radix-select-viewport]]:scrollbar-width-thin [&_[data-radix-select-viewport]]:scrollbar-color-neutral-300_transparent [&_[data-radix-select-viewport]::-webkit-scrollbar]:block [&_[data-radix-select-viewport]::-webkit-scrollbar]:w-1.5 [&_[data-radix-select-viewport]::-webkit-scrollbar-thumb]:rounded-full [&_[data-radix-select-viewport]::-webkit-scrollbar-thumb]:bg-neutral-300"
-
 const Select = SelectPrimitive.Root
 
 const SelectTrigger = React.forwardRef<
@@ -42,7 +37,7 @@ const SelectContent = React.forwardRef<
       className={cn(
         "relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 max-h-72 overflow-y-auto " + showScrollbar,
+          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1 max-h-72 overflow-y-auto",
         className
       )}
       position={position}

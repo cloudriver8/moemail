@@ -33,7 +33,7 @@ export async function GET() {
     defaultRole: defaultRole || ROLES.CIVILIAN,
     emailDomains: emailDomains || "moemail.app",
     adminContact: adminContact || "",
-    maxEmails: maxEmails || EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString(),
+    maxEmails: maxEmails && Number(maxEmails) >= 1 ? maxEmails : EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString(),
     registrationEnabled: registrationEnabled !== "false",
     turnstile: canManageConfig ? {
       enabled: turnstileEnabled === "true",
